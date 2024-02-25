@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BA11D1FE2B7D4BB00017D48C /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA11D1FD2B7D4BB00017D48C /* SignUpView.swift */; };
 		BA402B622B741150007A57D7 /* TrakShowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402B612B741150007A57D7 /* TrakShowApp.swift */; };
 		BA402B642B741150007A57D7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402B632B741150007A57D7 /* ContentView.swift */; };
 		BA402B662B741153007A57D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BA402B652B741153007A57D7 /* Assets.xcassets */; };
@@ -32,12 +33,15 @@
 		BA402BA82B741583007A57D7 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = BA402BA72B741583007A57D7 /* GoogleSignIn */; };
 		BA402BAA2B741583007A57D7 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BA402BA92B741583007A57D7 /* GoogleSignInSwift */; };
 		BA402BAC2B7415F8007A57D7 /* Firebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402BAB2B7415F8007A57D7 /* Firebase.swift */; };
-		BA402BAD2B7415F8007A57D7 /* Firebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402BAB2B7415F8007A57D7 /* Firebase.swift */; };
-		BA402BAE2B7415F8007A57D7 /* Firebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402BAB2B7415F8007A57D7 /* Firebase.swift */; };
 		BA402BB22B748504007A57D7 /* TvShowApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402BB12B748504007A57D7 /* TvShowApi.swift */; };
 		BA402BB42B7550C2007A57D7 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402BB32B7550C2007A57D7 /* LoginView.swift */; };
 		BAE709902B757BBF00A43070 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE7098F2B757BBF00A43070 /* ExploreView.swift */; };
 		BAE709942B75C77000A43070 /* TvShowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE709932B75C77000A43070 /* TvShowView.swift */; };
+		BAE709962B75FD5D00A43070 /* UserAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE709952B75FD5D00A43070 /* UserAccountView.swift */; };
+		BAE709992B7609C000A43070 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = BAE709982B7609C000A43070 /* Nuke */; };
+		BAE7099B2B7609C000A43070 /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = BAE7099A2B7609C000A43070 /* NukeExtensions */; };
+		BAE7099D2B7609C000A43070 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = BAE7099C2B7609C000A43070 /* NukeUI */; };
+		BAE7099F2B7609C000A43070 /* NukeVideo in Frameworks */ = {isa = PBXBuildFile; productRef = BAE7099E2B7609C000A43070 /* NukeVideo */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +62,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BA11D1FD2B7D4BB00017D48C /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		BA402B5E2B741150007A57D7 /* TrakShow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrakShow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA402B612B741150007A57D7 /* TrakShowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrakShowApp.swift; sourceTree = "<group>"; };
 		BA402B632B741150007A57D7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -76,6 +81,7 @@
 		BA402BB32B7550C2007A57D7 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		BAE7098F2B757BBF00A43070 /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreView.swift; sourceTree = "<group>"; };
 		BAE709932B75C77000A43070 /* TvShowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvShowView.swift; sourceTree = "<group>"; };
+		BAE709952B75FD5D00A43070 /* UserAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAccountView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,10 +90,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				BA402BA12B741549007A57D7 /* FirebaseDatabaseSwift in Frameworks */,
+				BAE7099D2B7609C000A43070 /* NukeUI in Frameworks */,
 				BA402B9F2B741549007A57D7 /* FirebaseDatabase in Frameworks */,
 				BA402B932B741263007A57D7 /* FirebaseAnalyticsSwift in Frameworks */,
+				BAE709992B7609C000A43070 /* Nuke in Frameworks */,
 				BA402BA52B741549007A57D7 /* FirebaseFunctions in Frameworks */,
 				BA402B952B741263007A57D7 /* FirebaseAppCheck in Frameworks */,
+				BAE7099F2B7609C000A43070 /* NukeVideo in Frameworks */,
+				BAE7099B2B7609C000A43070 /* NukeExtensions in Frameworks */,
 				BA402BA82B741583007A57D7 /* GoogleSignIn in Frameworks */,
 				BA402B912B741263007A57D7 /* FirebaseAnalytics in Frameworks */,
 				BA402B9B2B741549007A57D7 /* FirebaseAuth in Frameworks */,
@@ -145,10 +155,11 @@
 				BA402B652B741153007A57D7 /* Assets.xcassets */,
 				BA402B672B741153007A57D7 /* Preview Content */,
 				BA402B962B741308007A57D7 /* TrakShowManager.swift */,
-				BA402BAB2B7415F8007A57D7 /* Firebase.swift */,
 				BA402BB32B7550C2007A57D7 /* LoginView.swift */,
 				BAE7098F2B757BBF00A43070 /* ExploreView.swift */,
 				BAE709932B75C77000A43070 /* TvShowView.swift */,
+				BAE709952B75FD5D00A43070 /* UserAccountView.swift */,
+				BA11D1FD2B7D4BB00017D48C /* SignUpView.swift */,
 			);
 			path = TrakShow;
 			sourceTree = "<group>";
@@ -181,6 +192,7 @@
 		BA402BB02B7484E3007A57D7 /* Api */ = {
 			isa = PBXGroup;
 			children = (
+				BA402BAB2B7415F8007A57D7 /* Firebase.swift */,
 				BA402BB12B748504007A57D7 /* TvShowApi.swift */,
 			);
 			path = Api;
@@ -214,6 +226,10 @@
 				BA402BA42B741549007A57D7 /* FirebaseFunctions */,
 				BA402BA72B741583007A57D7 /* GoogleSignIn */,
 				BA402BA92B741583007A57D7 /* GoogleSignInSwift */,
+				BAE709982B7609C000A43070 /* Nuke */,
+				BAE7099A2B7609C000A43070 /* NukeExtensions */,
+				BAE7099C2B7609C000A43070 /* NukeUI */,
+				BAE7099E2B7609C000A43070 /* NukeVideo */,
 			);
 			productName = TrakShow;
 			productReference = BA402B5E2B741150007A57D7 /* TrakShow.app */;
@@ -290,6 +306,7 @@
 			packageReferences = (
 				BA402B8F2B741263007A57D7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				BA402BA62B741583007A57D7 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				BAE709972B7609C000A43070 /* XCRemoteSwiftPackageReference "Nuke" */,
 			);
 			productRefGroup = BA402B5F2B741150007A57D7 /* Products */;
 			projectDirPath = "";
@@ -342,6 +359,8 @@
 				BA402B642B741150007A57D7 /* ContentView.swift in Sources */,
 				BA402B972B741308007A57D7 /* TrakShowManager.swift in Sources */,
 				BA402BAC2B7415F8007A57D7 /* Firebase.swift in Sources */,
+				BA11D1FE2B7D4BB00017D48C /* SignUpView.swift in Sources */,
+				BAE709962B75FD5D00A43070 /* UserAccountView.swift in Sources */,
 				BA402B622B741150007A57D7 /* TrakShowApp.swift in Sources */,
 				BA402BB22B748504007A57D7 /* TvShowApi.swift in Sources */,
 			);
@@ -351,7 +370,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BA402BAD2B7415F8007A57D7 /* Firebase.swift in Sources */,
 				BA402B982B741308007A57D7 /* TrakShowManager.swift in Sources */,
 				BA402B732B741154007A57D7 /* TrakShowTests.swift in Sources */,
 			);
@@ -363,7 +381,6 @@
 			files = (
 				BA402B7F2B741154007A57D7 /* TrakShowUITestsLaunchTests.swift in Sources */,
 				BA402B992B741308007A57D7 /* TrakShowManager.swift in Sources */,
-				BA402BAE2B7415F8007A57D7 /* Firebase.swift in Sources */,
 				BA402B7D2B741154007A57D7 /* TrakShowUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -525,7 +542,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.manngabe.TrakShow;
+				PRODUCT_BUNDLE_IDENTIFIER = com.manngabe.showtraks;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -555,7 +572,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.manngabe.TrakShow;
+				PRODUCT_BUNDLE_IDENTIFIER = com.manngabe.showtraks;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -697,6 +714,14 @@
 				minimumVersion = 7.0.0;
 			};
 		};
+		BAE709972B7609C000A43070 /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.3.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -754,6 +779,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BA402BA62B741583007A57D7 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		BAE709982B7609C000A43070 /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BAE709972B7609C000A43070 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = Nuke;
+		};
+		BAE7099A2B7609C000A43070 /* NukeExtensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BAE709972B7609C000A43070 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeExtensions;
+		};
+		BAE7099C2B7609C000A43070 /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BAE709972B7609C000A43070 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
+		};
+		BAE7099E2B7609C000A43070 /* NukeVideo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BAE709972B7609C000A43070 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeVideo;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

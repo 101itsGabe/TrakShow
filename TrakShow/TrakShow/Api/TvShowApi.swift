@@ -8,13 +8,14 @@
 import Foundation
 
 struct Wrapper: Decodable{
-    let tvShow: TVShow
+    let tvShow: TVShowSelected
 }
 
 struct TVShow : Decodable, Hashable{
     let id: Int
     let name: String
     let image_thumbnail_path: String?
+    //let episodes: [Episode]
 }
 
 struct SearchWrapper: Decodable{
@@ -25,38 +26,66 @@ struct SearchWrapper: Decodable{
     
 }
 
+struct TVShowSelected: Decodable{
+    let id: Int
+    let name: String
+    let description: String
+    let image_thumbnail_path: String
+    let rating: String
+    let episodes: [Episode]
+}
+
+struct Episode: Decodable, Hashable {
+    let season: Int
+    let episode: Int
+    let name: String
+}
+
 
 class TvShowApi
 {
     var baseShowUrl = "/api/show-details?q=:show"
     
-    func performApiCall() async throws -> TVShow {
-            let url = URL(string: "https://www.episodate.com/api/show-details?q=keeping-up-with-the-kardashians")!
-            let (data, _) = try await URLSession.shared.data(from: url)
-        let wrapper = try JSONDecoder().decode(Wrapper.self, from: data)
-        let tvShow = wrapper.tvShow
-        let id = tvShow.id
-        let name = tvShow.name
-        //print("TvShow: \(name) ID: \(id)")
+    func performApiCall(id: Any?) async throws -> TVShowSelected {
+        var url = URL(string: "")
+        if let stringID = id as? String {
+            var newSearch = ""
+            for curchar in stringID{
+                if curchar == " "{
+                    newSearch += "-"
+                }
+                else if curchar.isLetter {
+                    newSearch += curchar.lowercased()
+                }
+            }
+            //print(newSearch)
+            url = URL(string: "https://www.episodate.com/api/show-details?q=\(newSearch)")!
+        }
+        else if let intID = id as? Int {
+            url = URL(string: "https://www.episodate.com/api/show-details?q=\(intID)")!
+        }
+            let (data, _) = try await URLSession.shared.data(from: url!)
+            let wrapper = try JSONDecoder().decode(Wrapper.self, from: data)
+            let jsonString = String(data: data, encoding: .utf8)
+            //print(jsonString ?? "No data received")
+            
             return wrapper.tvShow
-    }
+        }
     
-    func getShows(search: String) async throws -> [TVShow]{
+    func getShows(search: String, page: Int) async throws -> [TVShow]{
         var shows: [TVShow] = []
+        //print(page)
         do{
             if(search == "")
             {
-                let url = URL(string: "https://www.episodate.com/api/most-popular?page=1")!
+                let url = URL(string: "https://www.episodate.com/api/most-popular?page=\(page)")!
                 let (data, _) = try await URLSession.shared.data(from: url)
                 let jsonString = String(data: data, encoding: .utf8)
-                print(jsonString ?? "No data received")
+                //print(jsonString ?? "No data received")
                 let searchWrapper = try JSONDecoder().decode(SearchWrapper.self, from: data)
                 
                 let total = searchWrapper.total
                 shows = searchWrapper.tv_shows
-                for show in shows{
-                    print(show.image_thumbnail_path)
-                }
             }
             else
             {
@@ -70,7 +99,7 @@ class TvShowApi
                     }
                 }
                 //print(newSearch)
-                let url = URL(string: "https://www.episodate.com/api/search?q=\(newSearch)&page=1")
+                let url = URL(string: "https://www.episodate.com/api/search?q=\(newSearch)&page=\(page)")
                 if let realUrl = url{
                     let (data, _) = try await URLSession.shared.data(from: realUrl)
                     let searchWrapper = try JSONDecoder().decode(SearchWrapper.self, from: data)
@@ -82,7 +111,6 @@ class TvShowApi
             print("in error")
             print(String(describing: error))
         }
-    
         
         return shows
     }

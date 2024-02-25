@@ -77,7 +77,11 @@ struct LoginView: View {
                     }
                 Text("or")
                     .foregroundStyle(Color.gray)
-                Button(action:{}){
+                Button(action:{
+                    Task{
+                        await trakShowManager.loginWithGoogle()
+                    }
+                }){
                     HStack{
                         Text("Login with")
                         Image("glogo")
@@ -91,8 +95,19 @@ struct LoginView: View {
                         .background(trakShowManager.btnColor)
                         .cornerRadius(20)
                 }
+                Text("or")
+                Button(action: {
+                    trakShowManager.signUpView = true
+                    trakShowManager.isLoginView = false
+                })
+                {
+                    Text("Sign Up")
+                }
                 
             }
+        }
+        .onAppear(){
+            trakShowManager.screenInt = 1
         }
     }
 }
