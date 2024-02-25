@@ -1,2 +1,2 @@
 # TrakShow Ios App 📺
-![Screen 1]("/images/explorePage.png")
+![Screen 1]("TrakShow/images/explorePage.png")
