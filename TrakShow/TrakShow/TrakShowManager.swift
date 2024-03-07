@@ -21,6 +21,11 @@ struct FirebaseTvShow : Hashable{
     var curSeason: Int
     var maxEpCurSeason: Int
 }
+
+struct TVPost: Hashable{
+    var email: String
+    var comment: String
+}
 class TrakShowManager: NSObject, ObservableObject
 {
     @Published var curUser = User()
@@ -44,6 +49,7 @@ class TrakShowManager: NSObject, ObservableObject
     @Published var selectedShowView = false
     @Published var userView = false
     @Published var signUpView = false
+    @Published var feedView = false
     
     //Explore View
     @Published var tvShows: [TVShow] = []
@@ -59,6 +65,10 @@ class TrakShowManager: NSObject, ObservableObject
     @Published var watchList: [FirebaseTvShow] = []
     @Published var epsInSeason = 0
     @Published var followingList: [String] = []
+    
+    
+    //FeedView
+    @Published var feedList: [TVPost] = []
     
     
     override init()
@@ -126,6 +136,7 @@ class TrakShowManager: NSObject, ObservableObject
         //print("UH INSIDE THE SHIT")
         do{
             tvShows = try await tvshowApi.getShows(search: search, page: page)
+            try await tvshowApi.tvmazeapi(search: search)
         }
         catch{
             print(error.localizedDescription)
@@ -144,6 +155,7 @@ class TrakShowManager: NSObject, ObservableObject
     
     func getUserShowList() async{
         do{
+            //print("Get Show List func Email: \(email)")
             let wList = await firebaseManager?.getShowList(email: email ?? "")
             if let showList = wList{
                 DispatchQueue.main.async{
@@ -188,10 +200,9 @@ class TrakShowManager: NSObject, ObservableObject
                                 }
                             }
                         }
-                        await firebaseManager?.updateEP(email: email ?? "", show: theShow, epBool: epBool)
+                        await firebaseManager?.updateEP(email: email ?? "", show: theShow, epBool: epBool, fullShow: fullSelectedShow!)
                         let wList = await firebaseManager?.getShowList(email: email ?? "")
                         watchList = wList ?? watchList
-                        
                         completion()
                     }
                 }
@@ -232,14 +243,25 @@ class TrakShowManager: NSObject, ObservableObject
         }
     }
     
-    func signOut() async{
-        do{
-            await firebaseManager?.signOut()
-            isLoginView = true
-            exploreView = false
-            selectedShowView = false
-            userView = false
-            signUpView = false
+    func signOut(){
+        Task{
+            do{
+                await firebaseManager?.signOut()
+                DispatchQueue.main.async {
+                    self.watchList = []
+                }
+            }
+            }
+    }
+    
+    func getPosts(){
+        Task{
+            do{
+                print(":/")
+                if let feedList1 = await firebaseManager?.getPosts(){
+                    feedList = feedList1
+                }
+            }
         }
     }
 

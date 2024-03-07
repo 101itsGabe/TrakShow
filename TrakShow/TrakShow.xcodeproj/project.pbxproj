@@ -35,6 +35,7 @@
 		BA402BAC2B7415F8007A57D7 /* Firebase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402BAB2B7415F8007A57D7 /* Firebase.swift */; };
 		BA402BB22B748504007A57D7 /* TvShowApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402BB12B748504007A57D7 /* TvShowApi.swift */; };
 		BA402BB42B7550C2007A57D7 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA402BB32B7550C2007A57D7 /* LoginView.swift */; };
+		BA64F22E2B8FEF3800BD0F33 /* FeedPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA64F22D2B8FEF3800BD0F33 /* FeedPageView.swift */; };
 		BAE709902B757BBF00A43070 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE7098F2B757BBF00A43070 /* ExploreView.swift */; };
 		BAE709942B75C77000A43070 /* TvShowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE709932B75C77000A43070 /* TvShowView.swift */; };
 		BAE709962B75FD5D00A43070 /* UserAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE709952B75FD5D00A43070 /* UserAccountView.swift */; };
@@ -79,6 +80,7 @@
 		BA402BAF2B74165F007A57D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		BA402BB12B748504007A57D7 /* TvShowApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvShowApi.swift; sourceTree = "<group>"; };
 		BA402BB32B7550C2007A57D7 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		BA64F22D2B8FEF3800BD0F33 /* FeedPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedPageView.swift; sourceTree = "<group>"; };
 		BAE7098F2B757BBF00A43070 /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreView.swift; sourceTree = "<group>"; };
 		BAE709932B75C77000A43070 /* TvShowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvShowView.swift; sourceTree = "<group>"; };
 		BAE709952B75FD5D00A43070 /* UserAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAccountView.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				BAE709932B75C77000A43070 /* TvShowView.swift */,
 				BAE709952B75FD5D00A43070 /* UserAccountView.swift */,
 				BA11D1FD2B7D4BB00017D48C /* SignUpView.swift */,
+				BA64F22D2B8FEF3800BD0F33 /* FeedPageView.swift */,
 			);
 			path = TrakShow;
 			sourceTree = "<group>";
@@ -359,6 +362,7 @@
 				BA402B642B741150007A57D7 /* ContentView.swift in Sources */,
 				BA402B972B741308007A57D7 /* TrakShowManager.swift in Sources */,
 				BA402BAC2B7415F8007A57D7 /* Firebase.swift in Sources */,
+				BA64F22E2B8FEF3800BD0F33 /* FeedPageView.swift in Sources */,
 				BA11D1FE2B7D4BB00017D48C /* SignUpView.swift in Sources */,
 				BAE709962B75FD5D00A43070 /* UserAccountView.swift in Sources */,
 				BA402B622B741150007A57D7 /* TrakShowApp.swift in Sources */,

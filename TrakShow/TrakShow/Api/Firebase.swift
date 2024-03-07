@@ -129,6 +129,7 @@ class FirebaseManager: NSObject, ObservableObject{
         var showList: [FirebaseTvShow] = []
         let database = Firestore.firestore()
         let userCollection = database.collection("Users")
+        //print("Firebase show List email: \(email)")
         do{
             let querySnapshot = try await userCollection.whereField("email", isEqualTo: email.lowercased()).getDocuments()
             
@@ -249,8 +250,12 @@ class FirebaseManager: NSObject, ObservableObject{
                             "epsInSeason": epsInSeason,
                             "timestamp": Timestamp()
                         ])
+                        await updatePost(type: 1, show: show, email: email, curEpNum: 1, curSeason: 1)
+                        
                     }
                 }
+                
+                
             }
         }
         catch{
@@ -269,7 +274,7 @@ class FirebaseManager: NSObject, ObservableObject{
     }
     
     
-    func updateEP(email:String, show: FirebaseTvShow, epBool: Bool) async{
+    func updateEP(email:String, show: FirebaseTvShow, epBool: Bool, fullShow: TVShowSelected) async{
         let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         do{
@@ -297,10 +302,12 @@ class FirebaseManager: NSObject, ObservableObject{
                                     print(curEpOn)
                                     if epBool == true{
                                         if epCount >= curEpOn + 1{
-                                            print("Im in")
                                             showRef.updateData(["curepnum": curEpOn + 1]) { error in
                                                 if let error = error {
                                                     print("Error updating document: \(error)")
+                                                }
+                                                Task{
+                                                    await self.updatePost(type: 2, show: fullShow, email: email, curEpNum: curEpOn + 1, curSeason: show.curSeason)
                                                 }
                                             }
                                         }
@@ -309,13 +316,18 @@ class FirebaseManager: NSObject, ObservableObject{
                                                 if let error = error {
                                                     print("Error updating document: \(error)")
                                                 }
+                                                //await updatePost(type: 2, show: fullShow, email: email, curEpNum: 1, curSeason: show.curSeason + 1)
                                             }
                                             showRef.updateData(["curseason": show.curSeason + 1]) { error in
                                                 if let error = error {
                                                     print("Error updating document: \(error)")
                                                 }
+                                                Task{
+                                                    await self.updatePost(type: 2, show: fullShow, email: email, curEpNum: 1, curSeason: show.curSeason + 1)
+                                                }
                                             }
                                         }
+                                        
                                     }
                                     else{
                                         if 1 <= curEpOn - 1{
@@ -460,12 +472,85 @@ class FirebaseManager: NSObject, ObservableObject{
     }
     
     func signOut() async{
-        print("HELLO")
         do{
             try Auth.auth().signOut()
         }
         catch{
-            print("uh guys hes right behind me isnt he")
+            print(String(describing: error))
+        }
+    }
+    
+    func getPosts()async -> [TVPost]{
+        let db = Firestore.firestore()
+        let postCollection = db.collection("UserFeed")
+        var feedList: [TVPost] = []
+        print("Inside get posts")
+        do{
+            let querySnapshot = try await postCollection
+                .order(by: "timestamp", descending: true)
+                .getDocuments()
+            
+            if !querySnapshot.isEmpty{
+                for document in querySnapshot.documents{
+                    var tvpost = TVPost(email: "", comment: "")
+                    let data = document.data()
+                    tvpost.email = data["email"] as? String ?? "nah"
+                    tvpost.comment = data["comment"] as? String ?? "no comment"
+                    feedList.append(tvpost)
+                }
+            }
+        }
+        catch{
+            print(String(describing: error))
+        }
+        
+        return feedList
+    }
+    
+    func updatePost(type: Int, show: TVShowSelected, email: String, curEpNum: Int, curSeason: Int) async{
+        let db = Firestore.firestore()
+        let postCollection = db.collection("UserFeed")
+        let fullshow = trakshowmanager?.fullSelectedShow
+        var epName = ""
+        var found = false
+        for ep in show.episodes{
+                print("\(ep.season): \(ep.episode)")
+                if ep.season == curSeason && ep.episode == curEpNum{
+                    print(ep.name)
+                    epName = ep.name
+                    found = true
+                }
+                if found == true{
+                    break;
+                }
+            }
+
+        do{
+            if curEpNum == 1 && curSeason == 1{
+                //Show Added
+                let docRef = try await postCollection.addDocument(data: [
+                    "comment": "Just added \(show.name)!",
+                    "email": email,
+                    "tvshowname": show.name,
+                    "timestamp": Timestamp(),
+                    "curEpNum": 1,
+                    "curSeason": 1,
+                    "curEpName": epName
+                    
+                ])
+                
+            }
+            
+            else {
+                //Episode Updated
+                let docRef = try await postCollection.addDocument(data: [
+                    "comment" : "On to the next ep! Season:\(curSeason) Episode: \(curEpNum), \(epName)",
+                    "email" : email,
+                    "timestamp" : Timestamp(),
+                    ])
+            }
+        }
+        catch{
             print(String(describing: error))
         }
     }

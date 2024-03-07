@@ -41,10 +41,46 @@ struct Episode: Decodable, Hashable {
     let name: String
 }
 
+struct MazeStart: Decodable{
+    let tvShowMaze: TVShowMaze
+}
+
+struct TVShowMaze: Decodable{
+    let score: String?
+    let show: Show?
+}
+
+struct Show: Decodable, Hashable {
+    let id: Int?
+    let name: String?
+}
+
+struct rating: Decodable{
+    let average: Double
+}
+
 
 class TvShowApi
 {
     var baseShowUrl = "/api/show-details?q=:show"
+    var baseSearchUrl2 = "/search/shows?q=:query"
+    
+    func tvmazeapi(search: String) async throws {
+        var url = URL(string: "https://api.tvmaze.com/search/shows?q=haikyu")
+        let (data, _) = try await URLSession.shared.data(from: url!)
+        let jsonString = String(data: data, encoding: .utf8)
+        print("right before json string")
+        print(jsonString ?? "Nah")
+        print("\n\n\n\n")
+        let showWrapper = try JSONDecoder().decode([MazeStart].self, from: data)
+        print(showWrapper.count)
+        for showShit in showWrapper{
+            print(showShit.tvShowMaze.show?.name ?? "Nah")
+        }
+        
+        //pt2.
+        
+    }
     
     func performApiCall(id: Any?) async throws -> TVShowSelected {
         var url = URL(string: "")
@@ -66,7 +102,7 @@ class TvShowApi
         }
             let (data, _) = try await URLSession.shared.data(from: url!)
             let wrapper = try JSONDecoder().decode(Wrapper.self, from: data)
-            let jsonString = String(data: data, encoding: .utf8)
+            //let jsonString = String(data: data, encoding: .utf8)
             //print(jsonString ?? "No data received")
             
             return wrapper.tvShow

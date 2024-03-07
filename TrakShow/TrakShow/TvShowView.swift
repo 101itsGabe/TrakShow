@@ -10,6 +10,7 @@ import SwiftUI
 struct TvShowView: View {
     @ObservedObject var trakShowManager: TrakShowManager
     @State private var imageData: Data? = nil
+    @State private var selectedEpisodeIndex = 0
     var body: some View {
         ScrollView{
             ZStack{
@@ -118,20 +119,33 @@ struct TvShowView: View {
                     }
                     
                     if trakShowManager.isAdded == true {
-                        ForEach(trakShowManager.watchList, id: \.self) { curShow in
-                            if curShow.name == trakShowManager.fullSelectedShow?.name {
-                                if let episodes = trakShowManager.fullSelectedShow?.episodes{
-                                    ForEach(episodes, id: \.self) { ep in
-                                        if ep.episode == curShow.curEpNum && ep.season == curShow.curSeason{
-                                            Text("Season: \(curShow.curSeason) Ep: \(curShow.curEpNum) \(ep.name)")
-                                                .padding()
+                        
+                         ForEach(trakShowManager.watchList, id: \.self) { curShow in
+                         if curShow.name == trakShowManager.fullSelectedShow?.name {
+                         if let episodes = trakShowManager.fullSelectedShow?.episodes{
+                         ForEach(episodes, id: \.self) { ep in
+                         if ep.episode == curShow.curEpNum && ep.season == curShow.curSeason{
+                         Text("Season: \(curShow.curSeason) Ep: \(curShow.curEpNum) \(ep.name)")
+                         .padding()
+                         .foregroundStyle(.white)
+                         }
+                         }
+                         
+                         }
+                         }
+                         }
+                         
+                        
+                        Picker(selection: $selectedEpisodeIndex, label: Text("Select Episode")) {
+                                        ForEach(trakShowManager.fullSelectedShow?.episodes ?? [], id: \.self) { index in
+                                            Text("Season: \(index.season) Ep: \(index.episode), \(index.name)")
                                                 .foregroundStyle(.white)
                                         }
                                     }
-                                    
-                                }
-                            }
-                        }
+                                    .pickerStyle(WheelPickerStyle())
+                        
+
+                        /*
                         HStack{
                             Button(action:{
                                 Task{
@@ -156,6 +170,7 @@ struct TvShowView: View {
                                     .padding()
                             }
                         }
+                        */
                     }
                     
                     else{

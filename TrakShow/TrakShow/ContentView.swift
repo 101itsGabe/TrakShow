@@ -32,6 +32,10 @@ struct ContentView: View {
                     SignUpView(trakShowManager: trakshowManager)
                 }
                 
+                else if (trakshowManager.feedView == true){
+                    FeedPageView(trakShowManager: trakshowManager)
+                }
+                
                 else
                 {
                     LoginView(trakShowManager: trakshowManager)
@@ -46,7 +50,10 @@ struct ContentView: View {
                             
                             Spacer()
                             Button(action:{
-                                //User feed
+                                trakshowManager.userView = false
+                                trakshowManager.selectedShowView = false
+                                trakshowManager.exploreView = false
+                                trakshowManager.feedView = true
                             })
                             {
                                 Image(systemName: "book.pages")
@@ -59,6 +66,7 @@ struct ContentView: View {
                                 trakshowManager.userView = true
                                 trakshowManager.selectedShowView = false
                                 trakshowManager.exploreView = false
+                                trakshowManager.feedView = false
                             })
                             {
                                 Image(systemName: "person.crop.square")

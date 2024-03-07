@@ -26,6 +26,17 @@ struct UserAccountView: View {
                     .foregroundStyle(Color.white)
                 
                 if(choice == "ShowListing"){
+                    ScrollView(.horizontal) {
+                        LazyHStack {
+                            ForEach(trakShowManager.watchList, id: \.self){ tvShow in
+                                Text(tvShow.name)
+                                    .padding()
+                                    .background(trakShowManager.logintxtColor)
+                                    .foregroundStyle(.white)
+                                    .cornerRadius(8)
+                            }
+                        }
+                    }
                     List{
                         ForEach(trakShowManager.watchList, id: \.self){ tvShow in
                             Button(action:{
@@ -69,7 +80,16 @@ struct UserAccountView: View {
                 }
                 Button(action:{
                     Task{
-                        await trakShowManager.signOut()
+                        do{
+                            trakShowManager.signOut()
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        trakShowManager.isLoginView = true
+                        trakShowManager.exploreView = false
+                        trakShowManager.selectedShowView = false
+                        trakShowManager.userView = false
+                        trakShowManager.signUpView = false
                     }
                 }){
                     Text("Logout")
@@ -83,6 +103,7 @@ struct UserAccountView: View {
         }
         .onAppear(){
             Task{
+                print("List Appearing")
                 await trakShowManager.getUserShowList()
                 await trakShowManager.getFollowers()
             }
