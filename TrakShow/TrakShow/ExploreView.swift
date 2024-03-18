@@ -28,8 +28,8 @@ struct ExploreView: View {
                     }())
                     .onChange(of: search){ newValue in
                         Task{
-                            await trakShowManager.getShows(search: newValue, page: curPage ?? 1)
-                                
+                            //await trakShowManager.getShows(search: newValue, page: curPage ?? 1)
+                            await trakShowManager.getMazeShows(search: newValue)
                             }
                         }
                 }
@@ -40,17 +40,24 @@ struct ExploreView: View {
                 .padding()
                 
                 Spacer()
-                
+                if trakShowManager.mazeTvShows.isEmpty{
+                    Text("Search for a Show!")
+                        .padding()
+                        .foregroundStyle(.white)
+                }
                 List{
-                    ForEach(trakShowManager.tvShows, id: \.self){ tvShow in
+                    ForEach(trakShowManager.mazeTvShows, id: \.self){ tvShow in
                         Button(action:{
-                            trakShowManager.selectedShow = tvShow
+                            //trakShowManager.selectedShow = tvShow
+                            trakShowManager.mazeSelectedShow = tvShow
                             trakShowManager.exploreView = false
                             trakShowManager.selectedShowView = true
                             trakShowManager.lastPageOn = curPage
                         }){
                             HStack{
-                                if let imageUrl = URL(string: tvShow.image_thumbnail_path ?? "") {
+                                
+                                if let imageUrl = URL(string: tvShow.image?.original ?? "") {
+                                    
                                                     AsyncImage(url: imageUrl) { image in
                                                         image
                                                             .resizable()
@@ -64,7 +71,8 @@ struct ExploreView: View {
                                                     Text("No Image")
                                                         .foregroundStyle(.white)
                                                 }
-                                Text(tvShow.name)
+
+                                Text(tvShow.name ?? "no")
                                     .foregroundStyle(.white)
                                     .padding()
                                     .bold()
@@ -78,18 +86,18 @@ struct ExploreView: View {
                     .onAppear(){
                         curPage = trakShowManager.lastPageOn
                         Task{
-                            await trakShowManager.getShows(search: search, page: curPage ?? 1)
+                            //await trakShowManager.getShows(search: search, page: curPage ?? 1)
                         }
                     }
                     .onChange(of: search){ _ in
                         Task{
-                            await trakShowManager.getShows(search: search, page: curPage ?? 1)
+                            //await trakShowManager.getShows(search: search, page: curPage ?? 1)
                     }
                 }
                     .onChange(of: curPage){ _ in
                         Task{
                             print("HELLO CHANGING PAGE")
-                            await trakShowManager.getShows(search: search, page: curPage ?? 1)
+                            //await trakShowManager.getShows(search: search, page: curPage ?? 1)
                         }
                         
                     }
@@ -97,7 +105,7 @@ struct ExploreView: View {
                 .background(trakShowManager.bkgrColor)
                 .scrollContentBackground(.hidden)
 
-                
+                /*
                 HStack{
                     Spacer()
                     Button(action:{
@@ -123,6 +131,7 @@ struct ExploreView: View {
                     }
                     Spacer()
                 }
+                */
             }
         }
         .onAppear(){

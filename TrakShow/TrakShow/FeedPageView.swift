@@ -20,6 +20,7 @@ struct FeedPageView: View {
                             Spacer()
                         }
                         Text(post.comment)
+                            .padding()
                     }
                     
                 }

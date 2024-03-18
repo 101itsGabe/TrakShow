@@ -18,10 +18,22 @@ import FirebaseFirestore
 class FirebaseManager: NSObject, ObservableObject{
     @Published var trakshowmanager: TrakShowManager?
     @Published private var epsInSeason = 0
+    private var authStateChangeHandle: AuthStateDidChangeListenerHandle?
     
     init(trakshowManager: TrakShowManager)
     {
         super.init()
+        authStateChangeHandle = Auth.auth().addStateDidChangeListener { auth, user in
+            if let user = user {
+                print(user.email ?? "nada")
+                trakshowManager.email = user.email
+                trakshowManager.isLoginView = false
+                trakshowManager.userView = true
+            }
+            else{
+                print("user is logged out")
+            }
+        }
     }
     
     func getUsersFromDatabase(email: String) async{
@@ -148,7 +160,7 @@ class FirebaseManager: NSObject, ObservableObject{
                     
                     // Iterate through documents in "tvshows" collection
                     for showDocument in showQuerySnapshot.documents {
-                        var CurShow = FirebaseTvShow(name: "", id: 0, curEpNum: 0, curSeason: 0, maxEpCurSeason: 0)
+                        var CurShow = FirebaseTvShow(name: "", id: 0, curEpNum: 0, curSeason: 0, maxEpCurSeason: 0, imgString: "")
                         let showData = showDocument.data()
                         if let showName = showData["name"] as? String
                         {
@@ -167,6 +179,10 @@ class FirebaseManager: NSObject, ObservableObject{
                         if let maxEpSeason = showData["epsInSeason"] as? Int{
                             CurShow.maxEpCurSeason = maxEpSeason
                         }
+                        if let imgStr = showData["imgUrl"] as? String{
+                            CurShow.imgString = imgStr
+                        }
+                        
                         
                         showList.append(CurShow)
                             
@@ -181,7 +197,7 @@ class FirebaseManager: NSObject, ObservableObject{
         return showList
     }
     
-    func ifShowExsits(email: String, show: TVShowSelected) async -> Bool{
+    func ifShowExsits(email: String, showname: String) async -> Bool{
         let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         var isAdded = false
@@ -195,13 +211,13 @@ class FirebaseManager: NSObject, ObservableObject{
                     let userDocRef = userCollection.document(id)
                     // Access the subcollection "tvshows"
                     let showCollection = userDocRef.collection("tvshows")
-                    let col = try await showCollection.whereField("name", isEqualTo: show.name).getDocuments()
+                    let col = try await showCollection.whereField("name", isEqualTo: showname).getDocuments()
                     if !col.isEmpty
                     {
                         for showRef in col.documents{
                             let data2 = showRef.data()
                             let curShowName = data2["name"] as? String
-                            if(show.name == curShowName)
+                            if(showname == curShowName)
                             {
                                 isAdded = true
                                 
@@ -223,9 +239,10 @@ class FirebaseManager: NSObject, ObservableObject{
     }
     
     
-    func addShowToList(email:String, show: TVShowSelected) async
+    func addShowToList(email:String, mazeShow: Show, mazeShowEpisodes: [MazeEpisode]) async
     {
-        countEps(show: show)
+        //countEps(show: show)
+        print(mazeShowEpisodes.count)
         let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         do{
@@ -238,19 +255,20 @@ class FirebaseManager: NSObject, ObservableObject{
                     let userDocRef = userCollection.document(id)
                     // Access the subcollection "tvshows"
                     let showCollection = userDocRef.collection("tvshows")
-                    let col = try await showCollection.whereField("name", isEqualTo: show.name)
+                    let col = try await showCollection.whereField("name", isEqualTo: mazeShow.name ?? "")
                         .getDocuments()
                     if col.isEmpty
                     {
                         try await showCollection.addDocument(data: [
-                            "name": show.name,
-                            "id": show.id,
+                            "name": mazeShow.name ?? "",
+                            "id": mazeShow.id ?? 0,
                             "curepnum": 1,
                             "curseason": 1,
-                            "epsInSeason": epsInSeason,
-                            "timestamp": Timestamp()
+                            "epsInSeason": mazeShowEpisodes.count,
+                            "timestamp": Timestamp(),
+                            "imgUrl": mazeShow.image?.medium ?? ""
                         ])
-                        await updatePost(type: 1, show: show, email: email, curEpNum: 1, curSeason: 1)
+                        await updatePost(type: 1, show: mazeShow, showEpisodes: mazeShowEpisodes, email: email, curEpNum: 1, curSeason: 1)
                         
                     }
                 }
@@ -274,7 +292,7 @@ class FirebaseManager: NSObject, ObservableObject{
     }
     
     
-    func updateEP(email:String, show: FirebaseTvShow, epBool: Bool, fullShow: TVShowSelected) async{
+    func updateEP(email:String, show: FirebaseTvShow, epBool: Bool, mazeShow: Show, mazeEpisodes: [MazeEpisode]) async{
         let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         do{
@@ -287,7 +305,7 @@ class FirebaseManager: NSObject, ObservableObject{
                     let userDocRef = userCollection.document(id)
                     // Access the subcollection "tvshows"
                     let showCollection = userDocRef.collection("tvshows")
-                    let col = try await showCollection.whereField("name", isEqualTo: show.name)
+                    let col = try await showCollection.whereField("name", isEqualTo: mazeShow.name ?? "nah")
                         .getDocuments()
 
                     if !col.isEmpty
@@ -307,7 +325,9 @@ class FirebaseManager: NSObject, ObservableObject{
                                                     print("Error updating document: \(error)")
                                                 }
                                                 Task{
-                                                    await self.updatePost(type: 2, show: fullShow, email: email, curEpNum: curEpOn + 1, curSeason: show.curSeason)
+                                                    
+                                                    await self.updatePost(type: 2, show: mazeShow, showEpisodes: mazeEpisodes, email: email, curEpNum: curEpOn + 1, curSeason: show.curSeason)
+                                                     
                                                 }
                                             }
                                         }
@@ -323,7 +343,9 @@ class FirebaseManager: NSObject, ObservableObject{
                                                     print("Error updating document: \(error)")
                                                 }
                                                 Task{
+                                                    /*
                                                     await self.updatePost(type: 2, show: fullShow, email: email, curEpNum: 1, curSeason: show.curSeason + 1)
+                                                     */
                                                 }
                                             }
                                         }
@@ -338,6 +360,7 @@ class FirebaseManager: NSObject, ObservableObject{
                                             }
                                         }
                                         else{
+                                            
                                             if show.curSeason > 1{
                     
                                                 showRef.updateData(["curseason": show.curSeason - 1]) { error in
@@ -507,17 +530,16 @@ class FirebaseManager: NSObject, ObservableObject{
         return feedList
     }
     
-    func updatePost(type: Int, show: TVShowSelected, email: String, curEpNum: Int, curSeason: Int) async{
+    func updatePost(type: Int, show: Show, showEpisodes: [MazeEpisode], email: String, curEpNum: Int, curSeason: Int) async{
         let db = Firestore.firestore()
         let postCollection = db.collection("UserFeed")
         let fullshow = trakshowmanager?.fullSelectedShow
         var epName = ""
         var found = false
-        for ep in show.episodes{
-                print("\(ep.season): \(ep.episode)")
-                if ep.season == curSeason && ep.episode == curEpNum{
-                    print(ep.name)
-                    epName = ep.name
+        for ep in showEpisodes{
+            //print("\(ep.season ?? 0): \(ep.episode)")
+                if ep.season == curSeason && ep.number == curEpNum{
+                    epName = ep.name ?? "no nah"
                     found = true
                 }
                 if found == true{
@@ -529,13 +551,14 @@ class FirebaseManager: NSObject, ObservableObject{
             if curEpNum == 1 && curSeason == 1{
                 //Show Added
                 let docRef = try await postCollection.addDocument(data: [
-                    "comment": "Just added \(show.name)!",
+                    "comment": "Just added \(show.name ?? "no name")!",
                     "email": email,
-                    "tvshowname": show.name,
+                    "tvshowname": show.name ?? "no name",
                     "timestamp": Timestamp(),
                     "curEpNum": 1,
                     "curSeason": 1,
-                    "curEpName": epName
+                    "curEpName": epName,
+                    "likes" : 0,
                     
                 ])
                 

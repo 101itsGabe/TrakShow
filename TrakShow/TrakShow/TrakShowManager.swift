@@ -20,6 +20,7 @@ struct FirebaseTvShow : Hashable{
     var curEpNum: Int
     var curSeason: Int
     var maxEpCurSeason: Int
+    var imgString: String
 }
 
 struct TVPost: Hashable{
@@ -34,6 +35,7 @@ class TrakShowManager: NSObject, ObservableObject
     @Published var password: String?
     @Published var firebaseManager: FirebaseManager?
     @Published var isLoggededIn = false
+   
     
     @Published var btnColor = Color(red: (230/255), green: (170/255), blue: (235/255))
     @Published var logintxtColor = Color(red: 83/255, green: 99/255, blue: 137/255)
@@ -54,11 +56,14 @@ class TrakShowManager: NSObject, ObservableObject
     //Explore View
     @Published var tvShows: [TVShow] = []
     @Published var lastPageOn: Int?
+    @Published var mazeTvShows:[Show] = []
     let tvshowApi = TvShowApi()
     
     //TVShowView
     @Published var selectedShow: TVShow?
     @Published var fullSelectedShow: TVShowSelected?
+    @Published var mazeSelectedShow: Show?
+    @Published var mazeSelectedShowEpisodes: [MazeEpisode] = []
     @Published var isAdded = false
     
     //firebase/User
@@ -76,6 +81,7 @@ class TrakShowManager: NSObject, ObservableObject
         super.init()
         firebaseManager = FirebaseManager(trakshowManager: self)
         lastPageOn = 1
+        //authStateChangeHandle = Auth.auth().addStateDidChangeListener { auth, user in
     }
     
     func userNameStuff() async -> Void
@@ -89,21 +95,7 @@ class TrakShowManager: NSObject, ObservableObject
         var users = await firebaseManager?.getAllFirebaseUsers()
         
     }
-    
-    func callTvShowApi() async -> Void{
-        var curCount = 0
-        do{
-            fullSelectedShow = try await tvshowApi.performApiCall(id: selectedShow?.id ?? 0)
-        }
-        catch{
-            //print("this the error printing")
-            print(String(describing: error))
-        }
-        
-        epsInSeason = curCount
-        //print(epsInSeason)
-    }
-    
+
     func loginWithEmailPassword(email: String, password: String) async
     {
         do{
@@ -131,23 +123,13 @@ class TrakShowManager: NSObject, ObservableObject
         }
     }
     
-    
-    func getShows(search: String, page: Int) async{
-        //print("UH INSIDE THE SHIT")
-        do{
-            tvShows = try await tvshowApi.getShows(search: search, page: page)
-            try await tvshowApi.tvmazeapi(search: search)
-        }
-        catch{
-            print(error.localizedDescription)
-        }
-    }
-    
     func addShowToList() async{
         do{
-            await firebaseManager?.addShowToList(email: email ?? "", show: (fullSelectedShow)!)
-            let wList = await firebaseManager?.getShowList(email: email ?? "")
-            watchList = wList ?? watchList
+            if let show = mazeSelectedShow{
+                await firebaseManager?.addShowToList(email: email ?? "", mazeShow: show, mazeShowEpisodes: mazeSelectedShowEpisodes)
+                let wList = await firebaseManager?.getShowList(email: email ?? "")
+                watchList = wList ?? watchList
+            }
             
         }
     }
@@ -171,9 +153,10 @@ class TrakShowManager: NSObject, ObservableObject
     
     func ifShowExsist() async{
         do{
-            if let myBool = await firebaseManager?.ifShowExsits(email: email ?? "", show: (fullSelectedShow)!)
+            if let myBool = await firebaseManager?.ifShowExsits(email: email ?? "", showname: mazeSelectedShow?.name ?? "")
             {
                 //print(myBool)
+                print(mazeSelectedShow?.id ?? 0)
                 isAdded = myBool
             }
             
@@ -184,26 +167,31 @@ class TrakShowManager: NSObject, ObservableObject
         var theShow: FirebaseTvShow
         do{
             //Check if this the first ep of the season and get eps per season
+            
                 for curshow1 in watchList{
-                    if fullSelectedShow?.name == curshow1.name{
+                    if curshow1.name == mazeSelectedShow?.name ?? ""{
                         theShow = curshow1
                         if epBool == false{
                             if curshow1.curEpNum - 1 <= 1{
-                                if let episodes = fullSelectedShow?.episodes{
                                     var epCount = 0
-                                    for ep in episodes{
+                                    for ep in mazeSelectedShowEpisodes{
                                         if curshow1.curSeason - 1 == ep.season{
                                             epCount += 1
                                         }
                                     }
                                     theShow.maxEpCurSeason = epCount
-                                }
+                                
                             }
                         }
-                        await firebaseManager?.updateEP(email: email ?? "", show: theShow, epBool: epBool, fullShow: fullSelectedShow!)
+                        if let show = mazeSelectedShow{
+                            await firebaseManager?.updateEP(email: email ?? "", show: theShow, epBool: epBool, mazeShow: show, mazeEpisodes: mazeSelectedShowEpisodes)
+                        }
+                        
                         let wList = await firebaseManager?.getShowList(email: email ?? "")
                         watchList = wList ?? watchList
+                        
                         completion()
+                        
                     }
                 }
         }
@@ -263,6 +251,59 @@ class TrakShowManager: NSObject, ObservableObject
                 }
             }
         }
+    }
+    
+    func getMazeShows(search: String) async{
+        do{
+            mazeTvShows = try await tvshowApi.tvmazeapi(search: search)
+        }
+        catch{
+            print(String(describing: error))
+        }
+        
+    }
+    
+    func getMazeSingleShow() async{
+        do{
+            if mazeSelectedShow != nil{
+                mazeSelectedShowEpisodes = try await tvshowApi.tvmazepisodes(id: mazeSelectedShow?.id ?? 0)
+            }
+        }
+        catch{
+            print(String(describing: error))
+        }
+    }
+    
+    func setMazeShow(id: Int){
+        Task{
+            do{
+                print("HELLO?")
+                if mazeSelectedShow != nil{
+                    print(mazeSelectedShow?.name ?? "")
+                }
+                mazeSelectedShow = try await tvshowApi.tvmazesingleShow(id: id)
+                print(mazeSelectedShow?.name ?? "nada")
+            }
+            catch{
+                print(String(describing: error))
+            }
+        }
+    }
+    
+    func contentViewSwither(){
+        isLoginView = true
+        exploreView = false
+        selectedShowView = false
+        userView = false
+        signUpView = false
+    }
+    
+    func searchForUsers(search: String){
+        
+    }
+    
+    func printStuff(){
+        print("a heehee")
     }
 
 }

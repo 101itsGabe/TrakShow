@@ -41,23 +41,32 @@ struct Episode: Decodable, Hashable {
     let name: String
 }
 
-struct MazeStart: Decodable{
-    let tvShowMaze: TVShowMaze
-}
 
 struct TVShowMaze: Decodable{
-    let score: String?
+    let score: Double?
     let show: Show?
+    let image: MazeImage?
 }
 
 struct Show: Decodable, Hashable {
     let id: Int?
+    let url: String?
     let name: String?
+    let image: MazeImage?
+    let summary: String?
 }
 
-struct rating: Decodable{
-    let average: Double
+struct MazeImage: Decodable, Hashable{
+    let original: String?
+    let medium: String?
 }
+
+struct MazeEpisode: Decodable, Hashable{
+    let name: String?
+    let season: Int?
+    let number: Int?
+}
+
 
 
 class TvShowApi
@@ -65,89 +74,91 @@ class TvShowApi
     var baseShowUrl = "/api/show-details?q=:show"
     var baseSearchUrl2 = "/search/shows?q=:query"
     
-    func tvmazeapi(search: String) async throws {
-        var url = URL(string: "https://api.tvmaze.com/search/shows?q=haikyu")
+    func tvmazeapi(search: String) async throws -> [Show]{
+        var shows: [Show] = []
+        var url = URL(string: "https://api.tvmaze.com/search/shows?q=\(search)")
         let (data, _) = try await URLSession.shared.data(from: url!)
         let jsonString = String(data: data, encoding: .utf8)
-        print("right before json string")
-        print(jsonString ?? "Nah")
+        //print("right before json string")
+        //print(jsonString ?? "Nah")
+        /*
+        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+        if let prettyJsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: [.prettyPrinted]) {
+                if let prettyJsonString = String(data: prettyJsonData, encoding: .utf8) {
+                    print(prettyJsonString)
+                    print("\n\n")
+                }
+            }
+         */
         print("\n\n\n\n")
-        let showWrapper = try JSONDecoder().decode([MazeStart].self, from: data)
-        print(showWrapper.count)
-        for showShit in showWrapper{
-            print(showShit.tvShowMaze.show?.name ?? "Nah")
-        }
-        
-        //pt2.
-        
-    }
-    
-    func performApiCall(id: Any?) async throws -> TVShowSelected {
-        var url = URL(string: "")
-        if let stringID = id as? String {
-            var newSearch = ""
-            for curchar in stringID{
-                if curchar == " "{
-                    newSearch += "-"
-                }
-                else if curchar.isLetter {
-                    newSearch += curchar.lowercased()
-                }
-            }
-            //print(newSearch)
-            url = URL(string: "https://www.episodate.com/api/show-details?q=\(newSearch)")!
-        }
-        else if let intID = id as? Int {
-            url = URL(string: "https://www.episodate.com/api/show-details?q=\(intID)")!
-        }
-            let (data, _) = try await URLSession.shared.data(from: url!)
-            let wrapper = try JSONDecoder().decode(Wrapper.self, from: data)
-            //let jsonString = String(data: data, encoding: .utf8)
-            //print(jsonString ?? "No data received")
-            
-            return wrapper.tvShow
-        }
-    
-    func getShows(search: String, page: Int) async throws -> [TVShow]{
-        var shows: [TVShow] = []
-        //print(page)
         do{
-            if(search == "")
-            {
-                let url = URL(string: "https://www.episodate.com/api/most-popular?page=\(page)")!
-                let (data, _) = try await URLSession.shared.data(from: url)
-                let jsonString = String(data: data, encoding: .utf8)
-                //print(jsonString ?? "No data received")
-                let searchWrapper = try JSONDecoder().decode(SearchWrapper.self, from: data)
-                
-                let total = searchWrapper.total
-                shows = searchWrapper.tv_shows
-            }
-            else
-            {
-                var newSearch = ""
-                for curchar in search{
-                    if curchar == " "{
-                        newSearch += "-"
-                    }
-                    else{
-                        newSearch += curchar.lowercased()
-                    }
-                }
-                //print(newSearch)
-                let url = URL(string: "https://www.episodate.com/api/search?q=\(newSearch)&page=\(page)")
-                if let realUrl = url{
-                    let (data, _) = try await URLSession.shared.data(from: realUrl)
-                    let searchWrapper = try JSONDecoder().decode(SearchWrapper.self, from: data)
-                    shows = searchWrapper.tv_shows
+            let showWrapper = try JSONDecoder().decode([TVShowMaze].self, from: data)
+            for show in showWrapper{
+                //print(show)
+                if let show2 = show.show{
+                    //print("Show id: \(show2.id) ")
+                    shows.append(show2)
                 }
             }
         }
         catch{
-            print("in error")
-            print(String(describing: error))
+        print(String(describing: error))
         }
-        
         return shows
     }
+    
+    
+    func tvmazesingleShow(id: Int) async throws -> Show{
+        print("dejavu")
+        var curShow: Show
+        print(id)
+        var url = URL(string: "https://api.tvmaze.com/shows/\(id)")
+        let (data, _) = try await URLSession.shared.data(from: url!)
+        let jsonString = String(data: data, encoding: .utf8)
+        //print(jsonString)
+        /*
+        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+        if let prettyJsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: [.prettyPrinted]) {
+                if let prettyJsonString = String(data: prettyJsonData, encoding: .utf8) {
+                    print(prettyJsonString)
+                    print("\n\n")
+                }
+            }
+         */
+        do{
+            //print("in the deep")
+            let showWrapper = try JSONDecoder().decode(Show.self, from: data)
+            //print("after the deep")
+            curShow = showWrapper
+            //print(curShow.name)
+        }
+        return curShow
+    }
+    
+    func tvmazepisodes(id: Int) async throws ->[MazeEpisode]{
+        var eps: [MazeEpisode] = []
+        var url = URL(string: "https://api.tvmaze.com/shows/\(id)/episodes")
+        let (data, _) = try await URLSession.shared.data(from: url!)
+        let jsonString = String(data: data, encoding: .utf8)
+        
+        let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+        if let prettyJsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: [.prettyPrinted]) {
+                if let prettyJsonString = String(data: prettyJsonData, encoding: .utf8) {
+                    //print(prettyJsonString)
+                    //print("\n\n")
+                }
+            }
+        
+        do{
+            let epWrapper = try JSONDecoder().decode([MazeEpisode].self, from: data)
+            for ep in epWrapper{
+                //print("Season: \(ep.season) Ep: \(ep.number) \(ep.name)")
+                eps.append(ep)
+            }
+        }
+        
+        return eps
+        
+    }
+    
 }
