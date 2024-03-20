@@ -115,7 +115,7 @@ class TrakShowManager: NSObject, ObservableObject
                 await firebaseManager?.addUser(email: curemail)
             }
             else{
-                print("nigga is already in there")
+                print("is already in there")
             }
             email = curemail
             isLoginView = false

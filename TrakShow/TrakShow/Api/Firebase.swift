@@ -233,8 +233,8 @@ class FirebaseManager: NSObject, ObservableObject{
         catch{
             print(String(describing: error))
         }
-        print("we are at the very end")
-        print(isAdded)
+        //print("we are at the very end")
+        //print(isAdded)
         return isAdded
     }
     
@@ -539,7 +539,7 @@ class FirebaseManager: NSObject, ObservableObject{
         for ep in showEpisodes{
             //print("\(ep.season ?? 0): \(ep.episode)")
                 if ep.season == curSeason && ep.number == curEpNum{
-                    epName = ep.name ?? "no nah"
+                    epName = ep.name ?? "No Name"
                     found = true
                 }
                 if found == true{
@@ -567,7 +567,7 @@ class FirebaseManager: NSObject, ObservableObject{
             else {
                 //Episode Updated
                 let docRef = try await postCollection.addDocument(data: [
-                    "comment" : "On to the next ep! Season:\(curSeason) Episode: \(curEpNum), \(epName)",
+                    "comment" : "\(show.name ?? "no name"), On to the next ep! Season:\(curSeason) Ep: \(curEpNum), \(epName)",
                     "email" : email,
                     "timestamp" : Timestamp(),
                     ])

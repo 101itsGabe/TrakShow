@@ -11,7 +11,7 @@ struct FeedPageView: View {
     @StateObject var trakShowManager: TrakShowManager
     var body: some View {
         VStack{
-            Text("Pluto sent you on a lick")
+            //Text("The Feed")
             List{
                 ForEach(trakShowManager.feedList, id: \.self){post in
                     VStack{
@@ -21,6 +21,7 @@ struct FeedPageView: View {
                         }
                         Text(post.comment)
                             .padding()
+                            .foregroundStyle(.white)
                     }
                     
                 }
@@ -28,6 +29,9 @@ struct FeedPageView: View {
             .refreshable {
                 trakShowManager.getPosts()
             }
+            .listStyle(.plain)
+            .foregroundStyle(trakShowManager.bkgrColor)
+            .scrollContentBackground(.hidden)
             
         }
         .onAppear(){

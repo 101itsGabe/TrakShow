@@ -133,7 +133,7 @@ struct TvShowView: View {
                         
                         if let curEp = selectedEp{
                             if let num = curEp.number, let season = curEp.season{
-                                Text("Season: \(season) Ep: \(num): \(curEp.name ?? "noe nigga")")
+                                Text("Season: \(season) Ep: \(num): \(curEp.name ?? "no")")
                                     .foregroundStyle(.white)
                             }
                         }
