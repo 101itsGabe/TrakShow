@@ -36,6 +36,10 @@ struct ContentView: View {
                     FeedPageView(trakShowManager: trakshowManager)
                 }
                 
+                else if(trakshowManager.userSeacrh == true){
+                    FullUserSearchView(trakShowManager: trakshowManager)
+                }
+                
                 else
                 {
                     LoginView(trakShowManager: trakshowManager)

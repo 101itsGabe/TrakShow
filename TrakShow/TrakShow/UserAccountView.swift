@@ -17,6 +17,7 @@ struct UserAccountView: View {
     @State private var curEp = 0
     @State private var watchList: [FirebaseTvShow] = []
     @State private var isShow = false
+    @State private var curEpName = ""
     var body: some View {
         ZStack{
             trakShowManager.bkgrColor.ignoresSafeArea()
@@ -39,16 +40,19 @@ struct UserAccountView: View {
                                 ForEach(trakShowManager.watchList, id: \.self){ tvShow in
                                     Button(action:{
                                         Task{
-                                            do{
-                                                trakShowManager.setMazeShow(id: tvShow.id)
+                                                
+                                                await trakShowManager.setMazeShow(id: tvShow.id)
                                                 //trakShowManager.selectedShowView = true
                                                 //trakShowManager.userView = false
+                                                //print("Season: \(tvShow.curSeason) Ep: \(tvShow.curEpNum)")
                                                 selectedShow = tvShow
+                                                //print("INSIDE OF USER Season: \(tvShow.curSeason)Ep:\(tvShow.curEpNum)")
                                                 await trakShowManager.getMazeSingleShow()
                                                 curEp = selectedShow?.curEpNum ?? 0
                                                 curSeason = selectedShow?.curSeason ?? 0
                                                 isShow = true
-                                            }
+                                                
+                                            
                                         }
                                     }){
                                         VStack{
@@ -73,6 +77,15 @@ struct UserAccountView: View {
                                                 .foregroundStyle(.white)
                                                 .cornerRadius(8)
                                         }
+                                    }
+                                    .onChange(of: trakShowManager.mazeSelectedShowEpisodes){
+                                        curEpName = trakShowManager.mazeSelectedShowEpisodes.first(where: { $0.season == curSeason && $0.number == curEp})?.name ?? ""
+                                    }
+                                    .onChange(of: curSeason){
+                                        curEpName = trakShowManager.mazeSelectedShowEpisodes.first(where: { $0.season == curSeason && $0.number == curEp})?.name ?? ""
+                                    }
+                                    .onChange(of: curEp){
+                                        curEpName = trakShowManager.mazeSelectedShowEpisodes.first(where: { $0.season == curSeason && $0.number == curEp})?.name ?? ""
                                     }
                                 }
                             }
@@ -116,7 +129,8 @@ struct UserAccountView: View {
                                     }
                                 }
                                 
-                                Text(trakShowManager.mazeSelectedShowEpisodes.first(where: { $0.season == curSeason && $0.number == curEp})?.name ?? "Notin")
+                               
+                                Text(curEpName)
                                     .padding()
                                     .foregroundStyle(.white)
                                 HStack{
@@ -158,25 +172,37 @@ struct UserAccountView: View {
                 
                 //Following
                     else{
-                        HStack(spacing: 10){
-                            Image(systemName: "magnifyingglass")
-                                .padding(.leading)
-                            TextField("", text: $search, prompt: {
-                                Text("Search")
-                                    .foregroundColor(.white)
-                            }())
-                            .onChange(of: search){ newValue in
-                                Task{
-                                    //await trakShowManager.getShows(search: newValue, page: curPage ?? 1)
-                                    await trakShowManager.getMazeShows(search: newValue)
+                        HStack(spacing: 1){
+                            HStack(spacing: 10){
+                                Image(systemName: "magnifyingglass")
+                                    .padding(.leading)
+                                TextField("", text: $search, prompt: {
+                                    Text("Search")
+                                        .foregroundColor(.white)
+                                }())
+                                .onChange(of: search){ newValue in
+                                    Task{
+                                        //await trakShowManager.getShows(search: newValue, page: curPage ?? 1)
+                                        //await trakShowManager.getMazeShows(search: newValue)
+                                        //await TrakShowManager.getFollowers()
                                     }
                                 }
+                                
+                            }
+                            .foregroundColor(.white)
+                            .frame(width:350, height: 50)
+                            .background(trakShowManager.logintxtColor)
+                            .cornerRadius(20)
+                            .padding()
+                            
+                            Button(action: {
+                                trakShowManager.userSeacrh = true
+                                trakShowManager.userView = false
+                            }){
+                                Image(systemName: "person.badge.plus")
+                                    .padding(.trailing)
+                            }
                         }
-                        .foregroundColor(.white)
-                        .frame(width:350, height: 50)
-                        .background(trakShowManager.logintxtColor)
-                        .cornerRadius(20)
-                        .padding()
                         
                         List{
                             ForEach(trakShowManager.followingList, id: \.self){username in
@@ -215,7 +241,7 @@ struct UserAccountView: View {
             }
             .onAppear(){
                 Task{
-                    print("List Appearing")
+                    //print("List Appearing")
                     await trakShowManager.getUserShowList()
                     await trakShowManager.getFollowers()
                     await trakShowManager.getMazeSingleShow()

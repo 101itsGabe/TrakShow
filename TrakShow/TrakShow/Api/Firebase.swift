@@ -19,9 +19,11 @@ class FirebaseManager: NSObject, ObservableObject{
     @Published var trakshowmanager: TrakShowManager?
     @Published private var epsInSeason = 0
     private var authStateChangeHandle: AuthStateDidChangeListenerHandle?
+    private var database: Firestore
     
     init(trakshowManager: TrakShowManager)
     {
+        self.database = Firestore.firestore()
         super.init()
         authStateChangeHandle = Auth.auth().addStateDidChangeListener { auth, user in
             if let user = user {
@@ -36,9 +38,10 @@ class FirebaseManager: NSObject, ObservableObject{
         }
     }
     
-    func getUsersFromDatabase(email: String) async{
-        let databse = Firestore.firestore()
-        let userCollection = databse.collection("Users")
+    func getUsersFromDatabase(email: String) async -> String{
+        var email = ""
+        //database = Firestore.firestore()
+        let userCollection = database.collection("Users")
         do{
             let querySnapshot = try await userCollection.whereField("email", isEqualTo: email.lowercased()).getDocuments()
             
@@ -46,13 +49,16 @@ class FirebaseManager: NSObject, ObservableObject{
                 for document in querySnapshot.documents{
                     let data = document.data()
                     print(data["email"].debugDescription)
-                    trakshowmanager?.email = data["email"].debugDescription
+                    //trakshowmanager?.email = data["email"].debugDescription
+                    email = data["email"].debugDescription
                 }
             }
         }
         catch{
             print("Something Happened")
         }
+        
+        return email
     }
     
     
@@ -83,7 +89,7 @@ class FirebaseManager: NSObject, ObservableObject{
             let credentials = GoogleAuthProvider.credential(withIDToken: idToken.tokenString, accessToken: accessToken.tokenString)
             do{
                 let results = try await Auth.auth().signIn(with: credentials)
-                let firebaseUser = results.user
+                //let firebaseUser = results.user
                 //print(results.user.email ?? "")
                 email = results.user.email ?? ""
                 //print(email)
@@ -103,8 +109,8 @@ class FirebaseManager: NSObject, ObservableObject{
     func getAllFirebaseUsers() async -> [String]
     {
         var users: [String] = []
-        let db = Firestore.firestore()
-        let userCollection = db.collection("Users")
+        //let database = Firestore.firestore()
+        let userCollection = database.collection("Users")
         do
         {
             let querySnapshot = try await userCollection.getDocuments()
@@ -124,22 +130,26 @@ class FirebaseManager: NSObject, ObservableObject{
         return users
     }
     
-    func signInWithEmailPassword(email: String, password: String) async throws {
+    func signInWithEmailPassword(email: String, password: String) async throws -> String{
+        var curEmail = ""
         do {
             let authResult = try await Auth.auth().signIn(withEmail: email.lowercased(), password: password)
             // If sign-in is successful, proceed
             print("Logged In!")
-            self.trakshowmanager?.email = email
+            //self.trakshowmanager?.email = email
+            curEmail = email
         } catch {
             // If there's an error during sign-in, handle it
             print(error.localizedDescription)
             throw error // Rethrow the error to propagate it to the caller
         }
+        
+        return curEmail
     }
     
     func getShowList(email: String) async -> [FirebaseTvShow]{
         var showList: [FirebaseTvShow] = []
-        let database = Firestore.firestore()
+        //let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         //print("Firebase show List email: \(email)")
         do{
@@ -198,7 +208,7 @@ class FirebaseManager: NSObject, ObservableObject{
     }
     
     func ifShowExsits(email: String, showname: String) async -> Bool{
-        let database = Firestore.firestore()
+       // let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         var isAdded = false
         do{
@@ -243,7 +253,7 @@ class FirebaseManager: NSObject, ObservableObject{
     {
         //countEps(show: show)
         print(mazeShowEpisodes.count)
-        let database = Firestore.firestore()
+        //let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         do{
             let querySnapshot = try await userCollection.whereField("email", isEqualTo: email.lowercased()).getDocuments()
@@ -279,6 +289,7 @@ class FirebaseManager: NSObject, ObservableObject{
         catch{
             print("Something Happened")
         }
+        database = Firestore.firestore()
     }
     
     func countEps(show: TVShowSelected){
@@ -292,8 +303,9 @@ class FirebaseManager: NSObject, ObservableObject{
     }
     
     
+    //CHANGE TO NEXT SEASON NEEDS FIXING
     func updateEP(email:String, show: FirebaseTvShow, epBool: Bool, mazeShow: Show, mazeEpisodes: [MazeEpisode]) async{
-        let database = Firestore.firestore()
+        //let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         do{
             let querySnapshot = try await userCollection.whereField("email", isEqualTo: email.lowercased()).getDocuments()
@@ -388,10 +400,11 @@ class FirebaseManager: NSObject, ObservableObject{
         catch{
             print(String(describing: error))
         }
+        database = Firestore.firestore()
     }
     
     func deleteShow(email:String, show:FirebaseTvShow ) async{
-        let database = Firestore.firestore()
+        //let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         do{
             let querySnapshot = try await userCollection.whereField("email", isEqualTo: email.lowercased()).getDocuments()
@@ -426,10 +439,12 @@ class FirebaseManager: NSObject, ObservableObject{
         catch{
             print(String(describing: error))
         }
+        
+        database = Firestore.firestore()
     }
     
     func signUp(email: String, password: String) async{
-        let database = Firestore.firestore()
+        //let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         do{
             let newUserDocument = userCollection.document()
@@ -439,11 +454,12 @@ class FirebaseManager: NSObject, ObservableObject{
         catch{
             print(String(describing: error))
         }
+        database = Firestore.firestore()
     }
     
     func getFollowers(email: String) async -> [String]{
         var following: [String] = []
-        let database = Firestore.firestore()
+        //let database = Firestore.firestore()
         let userCollection = database.collection("Users")
         do{
             let querySnapshot = try await userCollection.whereField("email", isEqualTo: email.lowercased()).getDocuments()
@@ -477,8 +493,8 @@ class FirebaseManager: NSObject, ObservableObject{
     }
     
     func addUser(email: String) async {
-        let db = Firestore.firestore()
-        let userCollection = db.collection("Users")
+        //let db = Firestore.firestore()
+        let userCollection = database.collection("Users")
         
         do{
             let docRef = try await userCollection.addDocument(data: [
@@ -487,11 +503,13 @@ class FirebaseManager: NSObject, ObservableObject{
             ])
             
             let docId = docRef.documentID
-            let newUserCollection = db.collection("Users").document(docId).collection("tvshows")
+            let newUserCollection = database.collection("Users").document(docId).collection("tvshows")
         }
         catch{
            print(String(describing: error))
         }
+        
+        database = Firestore.firestore()
     }
     
     func signOut() async{
@@ -504,8 +522,8 @@ class FirebaseManager: NSObject, ObservableObject{
     }
     
     func getPosts()async -> [TVPost]{
-        let db = Firestore.firestore()
-        let postCollection = db.collection("UserFeed")
+        //let db = Firestore.firestore()
+        let postCollection = database.collection("UserFeed")
         var feedList: [TVPost] = []
         print("Inside get posts")
         do{
@@ -531,9 +549,9 @@ class FirebaseManager: NSObject, ObservableObject{
     }
     
     func updatePost(type: Int, show: Show, showEpisodes: [MazeEpisode], email: String, curEpNum: Int, curSeason: Int) async{
-        let db = Firestore.firestore()
-        let postCollection = db.collection("UserFeed")
-        let fullshow = trakshowmanager?.fullSelectedShow
+        //let db = Firestore.firestore()
+        let postCollection = database.collection("UserFeed")
+        //let fullshow = trakshowmanager?.fullSelectedShow
         var epName = ""
         var found = false
         for ep in showEpisodes{
@@ -576,6 +594,57 @@ class FirebaseManager: NSObject, ObservableObject{
         catch{
             print(String(describing: error))
         }
+        
+        database = Firestore.firestore()
+    }
+    
+    func updateToSpecificEp(email: String, mazeShow: Show, newEp: MazeEpisode) async{
+        //let database = Firestore.firestore()
+        let userCollection = database.collection("Users")
+        do{
+            let querySnapshot = try await userCollection.whereField("email", isEqualTo: email.lowercased()).getDocuments()
+            
+            //meaning something IS there
+            if !querySnapshot.isEmpty{
+                for document in querySnapshot.documents{
+                    let id = document.documentID
+                    let userDocRef = userCollection.document(id)
+                    // Access the subcollection "tvshows"
+                    let showCollection = userDocRef.collection("tvshows")
+                    let col = try await showCollection.whereField("name", isEqualTo: mazeShow.name ?? "nah")
+                        .getDocuments()
+                    
+                    for showDoc in col.documents{
+                        let docId = showDoc.documentID
+                        let showRef = showCollection.document(docId)
+                        let data = showDoc.data()
+                        
+                        
+                        //Updating showEp and season
+                        showRef.updateData(["curepnum": newEp.number]) { error in
+                            if let error = error{
+                                print(String(describing: error))
+                            }
+                        }
+                        
+                        showRef.updateData(["curseason": newEp.season]) { error in
+                            if let error = error{
+                                print(String(describing: error))
+                            }
+                        }
+                        
+                        
+                    }
+                    
+                    
+                }
+            }
+        }
+        catch{
+            print(String(describing: error))
+        }
+        
+        database = Firestore.firestore()
     }
     
 }

@@ -10,32 +10,51 @@ import SwiftUI
 struct FeedPageView: View {
     @StateObject var trakShowManager: TrakShowManager
     var body: some View {
-        VStack{
-            //Text("The Feed")
-            List{
-                ForEach(trakShowManager.feedList, id: \.self){post in
-                    VStack{
-                        HStack{
-                            Text(post.email)
-                            Spacer()
+        ZStack{
+            trakShowManager.bkgrColor.ignoresSafeArea()
+            VStack{
+                //Text("The Feed")
+                //trakShowManager.bkgrColor.ignoresSafeArea()
+                List{
+                    ForEach(trakShowManager.feedList, id: \.self){post in
+                        VStack{
+                            HStack{
+                                Text(post.email)
+                                    .padding()
+                                    .foregroundStyle(.white)
+                                Spacer()
+                            }
+                            Text(post.comment)
+                                .padding()
+                                .foregroundStyle(.white)
+                            HStack{
+                                Button(action:{}){
+                                    Image(systemName: "hand.thumbsup")
+                                        .padding()
+                                        .foregroundStyle(.white)
+                                }
+                                Spacer()
+                                Spacer()
+                            }
                         }
-                        Text(post.comment)
-                            .padding()
-                            .foregroundStyle(.white)
+                        .background(trakShowManager.bkgrColor)
+                        
                     }
                     
                 }
+                .scrollContentBackground(.hidden)
+                .refreshable {
+                    trakShowManager.getPosts()
+                }
+                .listStyle(.plain)
+                //.scrollContentBackground(.hidden)
+                .foregroundStyle(trakShowManager.bkgrColor)
+                //.background(trakShowManager.bkgrColor)
+                
             }
-            .refreshable {
+            .onAppear(){
                 trakShowManager.getPosts()
             }
-            .listStyle(.plain)
-            .foregroundStyle(trakShowManager.bkgrColor)
-            .scrollContentBackground(.hidden)
-            
-        }
-        .onAppear(){
-            trakShowManager.getPosts()
         }
     }
 }

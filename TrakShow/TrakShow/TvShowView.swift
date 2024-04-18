@@ -23,15 +23,14 @@ struct TvShowView: View {
                                 trakShowManager.exploreView = true
                                 trakShowManager.selectedShowView = false
                                 trakShowManager.fullSelectedShow = nil
-                                trakShowManager.selectedShow = nil
+                                //trakShowManager.selectedShow = nil
                             }
                             else if trakShowManager.screenInt == 3{
                                 trakShowManager.userView = true
                                 trakShowManager.selectedShowView = false
                                 trakShowManager.fullSelectedShow = nil
-                                trakShowManager.selectedShow = nil
+                                //trakShowManager.selectedShow = nil
                             }
-                            trakShowManager.printStuff()
                         }){
                             HStack{
                                 Image(systemName: "arrow.left")
@@ -118,7 +117,7 @@ struct TvShowView: View {
                                     ForEach(trakShowManager.mazeSelectedShowEpisodes, id: \.self) { ep in
                                         if let name = ep.name{
                                             if ep.number == curShow.curEpNum && ep.season == curShow.curSeason{
-                                                Text("Season: \(curShow.curSeason) Ep: \(curShow.curEpNum) \(name)")
+                                                Text("Your Ep - Season: \(curShow.curSeason) Ep: \(curShow.curEpNum) \(name)")
                                                     .padding()
                                                     .foregroundStyle(.white)
                                             }
@@ -133,7 +132,7 @@ struct TvShowView: View {
                         
                         if let curEp = selectedEp{
                             if let num = curEp.number, let season = curEp.season{
-                                Text("Season: \(season) Ep: \(num): \(curEp.name ?? "no")")
+                                Text("Selcted Ep - Season: \(season) Ep: \(num): \(curEp.name ?? "no")")
                                     .foregroundStyle(.white)
                             }
                         }
@@ -154,6 +153,16 @@ struct TvShowView: View {
                                 }
                             }
                             .pickerStyle(DefaultPickerStyle())
+                            .onChange(of: selectedEp){
+                                trakShowManager.changeEp(newEp: selectedEp!)
+                                //print("S: \(selectedEp?.season) E: \(selectedEp?.number), \(selectedEp?.name)")
+                                Task{
+                                    do{
+                                        await trakShowManager.getUserShowList()
+                                    }
+                                }
+                            }
+                        
                             
                             
                    
@@ -180,19 +189,21 @@ struct TvShowView: View {
                     }
                 }
                 .gesture(DragGesture()
-                    .onChanged{ gesture in
-                        if gesture.location.x < CGFloat(80){
+                    .onEnded{ gesture in
+                        //print(gesture.translation.width)
+                        if gesture.translation.width > 50 {
+                            //print("Translating")
                             if trakShowManager.screenInt == 2{
                                 trakShowManager.exploreView = true
                                 trakShowManager.selectedShowView = false
                                 trakShowManager.fullSelectedShow = nil
-                                trakShowManager.selectedShow = nil
+                                //trakShowManager.selectedShow = nil
                             }
                             else if trakShowManager.screenInt == 3{
                                 trakShowManager.userView = true
                                 trakShowManager.selectedShowView = false
                                 trakShowManager.fullSelectedShow = nil
-                                trakShowManager.selectedShow = nil
+                                //trakShowManager.selectedShow = nil
                             }
                         }
                         

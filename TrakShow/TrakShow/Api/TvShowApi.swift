@@ -7,24 +7,7 @@
 
 import Foundation
 
-struct Wrapper: Decodable{
-    let tvShow: TVShowSelected
-}
 
-struct TVShow : Decodable, Hashable{
-    let id: Int
-    let name: String
-    let image_thumbnail_path: String?
-    //let episodes: [Episode]
-}
-
-struct SearchWrapper: Decodable{
-    let total: String
-    let page: Int
-    let pages: Int
-    let tv_shows: [TVShow]
-    
-}
 
 struct TVShowSelected: Decodable{
     let id: Int
